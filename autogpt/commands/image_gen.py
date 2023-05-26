@@ -36,7 +36,7 @@ def generate_image(prompt: str, size: int = 256) -> str:
     elif CFG.image_provider == "huggingface":
         return generate_image_with_hf(prompt, filename)
     # SD WebUI
-    elif CFG.image_provider == "sdwebui":
+    elif CFG.image_provider == "sd_webui":
         return generate_image_with_sd_webui(prompt, filename, size)
     return "No Image Provider Set"
 
@@ -169,8 +169,8 @@ def generate_image_with_sd_webui(
             "prompt": prompt,
             "negative_prompt": negative_prompt,
             "sampler_index": "DDIM",
-            "steps": 20,
-            "cfg_scale": 7.0,
+            "steps": 30,
+            "cfg_scale": 12.0,
             "width": size,
             "height": size,
             "n_iter": 1,
@@ -187,3 +187,14 @@ def generate_image_with_sd_webui(
     image.save(filename)
 
     return f"Saved to disk:{filename}"
+
+
+if __name__=="__main__":
+    import os
+    from autogpt.workspace import Workspace
+    workspace_path = os.path.join(os.path.dirname(__file__), "workspace")
+    workspace_path = Workspace.make_workspace(workspace_path)
+    CFG.workspace_path = workspace_path
+    filename = f"{CFG.workspace_path}/{str(uuid.uuid4())}.jpg"
+    m = generate_image_with_sd_webui("Fantasy world, artstation", filename)
+    print(m)
